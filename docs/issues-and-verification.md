@@ -1,6 +1,6 @@
 # 问题与验收清单
 
-群里遇到的问题都记在这里：**发生了什么、改了哪一层、用什么证明改好了、还有哪些没测。** 不再只在聊天里说“已优化”。
+已发现的问题记录在这里：**发生了什么、改了哪一层、用什么证明改好了、还有哪些没测。** 历史验收记录继承自上游项目。
 
 当前清单对应本轮源码工作，不等于旧 Release 已含这些改动。网关、settings、turnstate 的本轮竞态测试与静态检查已通过；实际 Codex CLI 0.154.0 接本地模拟上游的 V1/V2 压缩及后续回复也已通过。真实账本已保留 11 次：Sol V2 压缩及后续回复、Terra 回复成功；追加的两次 Astra 短回复成功，但此前 Astra 容量失败和 292 未取得仍然成立；V1 直连上游 404，桥接追加验收首条 Sol 回复曾发生出口传输失败，整轮不算全部通过。测试状态分三层：
 
@@ -14,7 +14,7 @@
 
 ### 用户看到的情况
 
-接管生成的 provider 中有 `name = 'Sleep State (local)'`。群友问：这个名字会不会影响远程压缩？
+接管生成的 provider 中有 `name = 'Sleep State (local)'`。需要确认：这个名字是否影响远程压缩？
 
 ### 已定位的原因
 
@@ -69,7 +69,7 @@
 | P14 | Codex 能回复，面板没有显示；“未接管”容易被误当成功 | 显示接入步骤、只读模式、请求计数与最近状态；说明重启、目录、profile 覆盖 | `TestTrafficCountsRejectedRequestsWithoutSession`、`TestMetricsCountRejectedRequestsWithoutSession`；不能自动删除任务/项目覆盖 |
 | P15 | 空会话列表被当成从未收到请求 | 请求计数独立于会话；拒绝、模型列表和过期会话不再等同无流量 | 服务保留最近有限条元数据，出口切换不清空；不记录请求正文 |
 | P16 | `init`、`serve`、环境变量、目录对新手太复杂 | `setup` 创建缺失配置后启动；保留旧设置；Windows / macOS 双击脚本 | CLI 包竞态测试、静态检查和 macOS 脚本空格路径测试已通过；Windows 双击体验待本机验收 |
-| P17 | 群里排错要别人发完整配置，容易泄漏 | `doctor` 白名单摘要 + 面板脱敏诊断，不输出自由文本敏感字段 | `TestDoctorSafeReport`、`TestDoctorWithoutServiceDoesNotCreateFiles` 已通过；完整备份仍不可公开 |
+| P17 | 排错时索取完整配置，容易泄漏 | `doctor` 白名单摘要 + 面板脱敏诊断，不输出自由文本敏感字段 | `TestDoctorSafeReport`、`TestDoctorWithoutServiceDoesNotCreateFiles` 已通过；完整备份仍不可公开 |
 | P18 | 不知道改了哪份配置、profile/`CODEX_HOME` 混用 | `paths`、明确数据目录和 profile 教程；只读模式不假装接管成功 | 原有目录测试及 `TestReadOnlyRecoveryDoesNotPretendSuccess`；各桌面版本覆盖项待实测 |
 | P19 | 中转与官方混用，`requires_openai_auth=true` 导致判断错误 | 保留 provider 和认证类型；API key 通道不注入、不借官方凭据 | 历史真实 CLI → 本地模拟中转通过；本轮需回归，不能替所有中转作保证 |
 | P20 | 仅设置 `CCODEX_PROXY`，服务仍直连；用户把命令当代理输入 | 面板直接填地址并保存，区分来源读取与网络连接测试 | 面板解析、持久化、来源失败不覆盖旧配置已有测试；端口必须以用户软件为准 |

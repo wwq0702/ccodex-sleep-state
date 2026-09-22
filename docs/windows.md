@@ -1,12 +1,21 @@
 # Windows：解压、双击、填代理
 
-不需要安装 Go，也不需要管理员权限。先确认 Codex 原来的登录或中转配置能用；本工具不能代替登录、开通模型或增加额度。
+运行发布包不需要安装 Go，也不需要管理员权限。从源码构建需要 Git 和 Go，步骤见[完整部署流程](deployment.md)。先确认 Codex 原来的登录或中转配置能用；本工具不能代替登录、开通模型或增加额度。
 
 > 这份教程对应当前源码。旧发布包如果没有 `start.cmd` 或 `setup`，请先看对应 Release 说明。Windows 自动测试通过，不等于每一种 Windows 桌面版 Codex 都已实测。[验收边界](issues-and-verification.md)
 
 ## 1. 完整解压，不要只拖出 exe
 
-到 [Releases](https://github.com/gylive/ccodex-sleep-state/releases) 下载 ZIP。大多数电脑选 `windows-amd64`；Windows ARM 选 `windows-arm64`。核对来源和 `SHA256SUMS`，再完整解压到自己的目录，例如：
+到[本 Fork 的 Releases](https://github.com/wwq0702/ccodex-sleep-state/releases)下载 ZIP；没有安装包时，按[源码构建步骤](deployment.md#方式二从本-fork-源码构建)生成程序。也可选择[上游已发布版本](https://github.com/gylive/ccodex-sleep-state/releases)，但其中不包含本 Fork 的修改。不要把 Code → Download ZIP 或 Source code 当成安装包。
+
+大多数电脑选 `ccodex-sleep-state-windows-amd64.zip`；Windows ARM 选 `ccodex-sleep-state-windows-arm64.zip`。在「设置 → 系统 → 系统信息」确认系统类型。下载同一版本的 `SHA256SUMS`，在下载目录核对哈希（x64 示例）：
+
+```powershell
+Get-FileHash .\ccodex-sleep-state-windows-amd64.zip -Algorithm SHA256
+Get-Content .\SHA256SUMS
+```
+
+将计算结果与清单中同名文件的值比较，确认一致后完整解压到自己的目录，例如：
 
 ```text
 %LOCALAPPDATA%\Programs\ccodex-sleep-state
@@ -32,7 +41,7 @@
 
 第一次会创建服务配置，之后再运行会沿用原设置，不需要先 `init`。启动不发送模型请求；接管 Codex 后的真实对话和 state 采集可能消耗额度。
 
-正常情况下不需要复制口令：程序用短期、一次性的启动凭证进入面板，地址里的凭证会立即清除。若浏览器没打开或凭证过期，再使用终端显示的管理地址和口令手动进入。默认地址是 [http://127.0.0.1:17841/admin/](http://127.0.0.1:17841/admin/)。口令每次启动变化，不是 Codex 密码，不要截图发群。
+正常情况下不需要复制口令：程序用短期、一次性的启动凭证进入面板，地址里的凭证会立即清除。若浏览器没打开或凭证过期，再使用终端显示的管理地址和口令手动进入。默认地址是 [http://127.0.0.1:17841/admin/](http://127.0.0.1:17841/admin/)。口令每次启动变化，不是 Codex 密码，不要公开分享口令截图。
 
 `setup` 自动接入会先备份并尽量保留当前配置；没有配置代理时只检查 `127.0.0.1:7897`、`:7890`、`:10808` 的 SOCKS5 握手，找到后使用，不扫描外部网络、不读取代理账号库。已有订阅、代理、固定出口和模型选择继续保留。首次 `setup` 没有明确兜底策略时采用「采不到 state 时先正常转发」；之前明确选过 `strict` 的会保留，不会把不合格 state 假装成成功。首页「一键接入 Codex」是出现问题时的重新接入/修复入口，点击确认会选择普通转发兜底。
 
@@ -111,7 +120,7 @@
 .\ccodex-sleep-state.exe doctor
 ```
 
-它只读状态，不调用模型，不输出订阅、代理密码、管理口令、登录信息或聊天正文。把结果连同系统版本、Codex 版本和工具版本发给群友或 AI Agent。若运行了多个独立数据目录，`doctor` 要带上对应 `--data-dir`。
+它只读状态，不调用模型，不输出订阅、代理密码、管理口令、登录信息或聊天正文。反馈问题时附上结果、系统版本、Codex 版本和工具版本。若运行了多个独立数据目录，`doctor` 要带上对应 `--data-dir`。
 
 不要发整个数据目录。备份文件虽然有助于恢复，也可能包含你的私人配置。
 

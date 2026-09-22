@@ -1,6 +1,15 @@
-# macOS：解压后启动，不用安装 Go
+# macOS：下载或构建，再启动
 
-Apple 芯片选 `darwin-arm64`，Intel 芯片选 `darwin-amd64`。到 [Releases](https://github.com/gylive/ccodex-sleep-state/releases) 下载并核对来源、SHA256，完整解压到自己的目录，例如 `~/Applications/ccodex-sleep-state`。源码构建见[开发说明](development.md)。
+运行发布包不用安装 Go。先查看[本 Fork 的 Releases](https://github.com/wwq0702/ccodex-sleep-state/releases)，没有安装包时按[源码构建步骤](deployment.md#方式二从本-fork-源码构建)操作。也可使用[上游已发布版本](https://github.com/gylive/ccodex-sleep-state/releases)，但它不包含本 Fork 的修改。
+
+在「关于本机」确认芯片：Apple 芯片选 `ccodex-sleep-state-darwin-arm64.tar.gz`，Intel 芯片选 `ccodex-sleep-state-darwin-amd64.tar.gz`。同时下载该版本的 `SHA256SUMS`，在下载目录检查（Apple 芯片示例）：
+
+```sh
+shasum -a 256 ccodex-sleep-state-darwin-arm64.tar.gz
+cat SHA256SUMS
+```
+
+核对同名文件的哈希一致后，完整解压到自己的目录，例如 `~/Applications/ccodex-sleep-state`。Code → Download ZIP 和 Source code 是源码，需要编译；完整流程见[部署说明](deployment.md)。
 
 > 当前仍是公开测试版。教程对应当前源码，旧包未必包含新入口；以对应 Release 为准。真实测试和未验证内容见[问题与验收清单](issues-and-verification.md)。
 
@@ -18,7 +27,7 @@ Apple 芯片选 `darwin-arm64`，Intel 芯片选 `darwin-amd64`。到 [Releases]
 
 如果系统拦截，先确认来源，再使用系统提供的单应用放行方式。发布文件没有 Apple Developer 公证；不要关闭整个 Gatekeeper，也不要照着不明教程删除全局安全设置。
 
-浏览器会自动打开并进入本地面板，通常不需要复制口令。若未打开或一次性启动凭证过期，再打开终端显示的管理地址、粘贴管理口令；默认是 [http://127.0.0.1:17841/admin/](http://127.0.0.1:17841/admin/)。不要把口令或启动链接发到群里。
+浏览器会自动打开并进入本地面板，通常不需要复制口令。若未打开或一次性启动凭证过期，再打开终端显示的管理地址、粘贴管理口令；默认是 [http://127.0.0.1:17841/admin/](http://127.0.0.1:17841/admin/)。不要公开分享口令或启动链接。
 
 ## 接上自己的 Codex
 

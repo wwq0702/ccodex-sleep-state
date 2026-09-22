@@ -36,7 +36,9 @@
 
 ## 到哪里拿预览构建
 
-升级分支的 `Preview build` 工作流运行静态检查和竞态测试后，构建 Windows x64/ARM64、macOS Apple Silicon/Intel 四种包，并附带含依赖的源码包及 `SHA256SUMS`。构建产物放在对应 Actions 运行记录的 Artifacts 中，保留 14 天；这不是 GitHub Release，也不会创建正式版本标签。[查看工作流](https://github.com/gylive/ccodex-sleep-state/actions/workflows/preview.yml)
+本 Fork 的 `Preview build` 工作流运行静态检查和竞态测试后，构建 Windows x64/ARM64、macOS Apple Silicon/Intel 四种包，并附带含依赖的源码包及 `SHA256SUMS`。在[工作流页面](https://github.com/wwq0702/ccodex-sleep-state/actions/workflows/preview.yml)通过 **Run workflow** 选择目标分支；Fork 的 Actions 如未启用，需先启用。只有推送 `codex/pool-upgrade` 分支会自动触发预览构建。
+
+构建产物放在对应运行记录的 Artifacts 中，保留 14 天；这不是 GitHub Release，也不会创建正式版本标签。先解压下载的 artifact，再选择系统对应的包。完整步骤见[构建与发布说明](development.md#构建安装包和发布版本)。
 
 工作流文件存在不代表本次构建已成功；下载前核对对应提交的运行结果与校验文件。未跑完或失败的结果不写成已验收。
 

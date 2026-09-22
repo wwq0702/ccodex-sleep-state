@@ -1,24 +1,44 @@
 # ccodex-sleep-state
 
-**一个尝试改善 Codex 降智、限流和连接问题的本地工具。不是百分百有效，但把这套思路做成了大家能自己用的程序。**
+**Codex 本地连接、配置与 turn-state 管理工具。** 一个 Go 程序提供请求转发和网页管理面板，支持代理配置、状态采集、诊断及配置恢复。
 
-做这个项目，是因为 Codex 有时用着用着就不对劲：回答质量变了，请求被限了，换个配置又接不上。我们从代理出口和 turn-state 入手做了一些尝试，觉得值得继续验证，就整理成 Go 程序开源了。
-
-它不会增加账号额度，也不能保证换个出口就恢复质量。真正要做的是：**让连接、配置、采集和排错都看得见，别把所有问题都留给使用者手改文件。**
+本仓库基于 [gylive/ccodex-sleep-state](https://github.com/gylive/ccodex-sleep-state) 维护，保留上游版权、许可证与贡献记录。工具不会增加账号额度，也不保证改善回答质量。
 
 一个服务，一个本地网页。官方 ChatGPT、官方 API key 和 Responses 中转按各自的认证方式走；支持 Astra、5.6 Sol、5.6 Terra，能否调用仍取决于你的账号和上游。已有代理软件就填本地 HTTP / SOCKS5 地址，也可以导入自己的订阅或本地文件。
 
-[Windows 上手](docs/windows.md) · [macOS 上手](docs/macos.md) · [面板教程](docs/web-panel.md) · [代理与订阅](docs/proxies.md) · [问题与验收清单](docs/issues-and-verification.md) · [测试记录](docs/testing.md) · [联系与交流](#一起试一起反馈)
+[完整部署流程](docs/deployment.md) · [Windows 上手](docs/windows.md) · [macOS 上手](docs/macos.md) · [面板教程](docs/web-panel.md) · [代理与订阅](docs/proxies.md) · [问题与验收清单](docs/issues-and-verification.md) · [测试记录](docs/testing.md)
 
-> **当前仍是公开测试版。** 此 README 描述当前源码；下载时以对应 Release 的说明为准，旧发布包不会自动多出新功能。本轮真实 Sol 回复、V2 远程压缩及压缩后回复、Terra 回复已跑通；追加的两次 Astra 短回复也成功，但本轮仍没有采到合格 292；旧式 V1 压缩直连上游返回 404，Team 仍只做合成测试。不能把部分成功写成全部验收通过。具体边界见[问题与验收清单](docs/issues-and-verification.md)。
+> **当前仍是公开测试版。** 本说明对应当前源码，下载时以所选 Release 为准。历史真实上游测试记录继承自上游项目，state 采集、旧式压缩和 Team 等场景仍有未验收项，详见[问题与验收清单](docs/issues-and-verification.md)。本 Fork 的构建结果以[本仓库 Actions](https://github.com/wwq0702/ccodex-sleep-state/actions)为准。
 
-## 下载后，怎么开始
+## 安装与启动
+
+这是与 Codex 运行在同一台电脑上的本地服务，默认面板地址为 `http://127.0.0.1:17841/admin/`。网页已嵌入程序，运行发布包不需要安装 Go、Node.js、数据库或 Docker。当前配置只接受本机回环监听地址。
+
+### 1. 获取程序
+
+| 你要使用的版本 | 获取方式 |
+| --- | --- |
+| 本 Fork 的修改版 | 查看[本仓库 Releases](https://github.com/wwq0702/ccodex-sleep-state/releases)；没有发布包时，按[源码构建步骤](docs/deployment.md#方式二从本-fork-源码构建)生成程序 |
+| 上游已经发布的版本 | 查看[上游 Releases](https://github.com/gylive/ccodex-sleep-state/releases)；它不包含本 Fork 后续修改 |
+
+Fork 不会复制上游的 Release 安装包。GitHub 的 **Code → Download ZIP** 和 Release 的 **Source code** 是源码，不能解压后直接双击运行。
+
+| 系统 | 下载文件 |
+| --- | --- |
+| Windows x64 | `ccodex-sleep-state-windows-amd64.zip` |
+| Windows ARM64 | `ccodex-sleep-state-windows-arm64.zip` |
+| Apple 芯片 Mac（M 系列） | `ccodex-sleep-state-darwin-arm64.tar.gz` |
+| Intel Mac | `ccodex-sleep-state-darwin-amd64.tar.gz` |
+
+下载同一版本的 `SHA256SUMS` 并核对文件校验值，随后完整解压。具体命令见[部署流程](docs/deployment.md)。
+
+### 2. 准备 Codex 并启动
 
 先确认 Codex **不经过本工具时原本就能用**。官方账号先登录；中转先配好自己的 API key。用 CCS / CC Switch 的，先选好这次要用的配置，再退出 Codex，暂时别继续切换。
 
-1. 到 [Releases](https://github.com/gylive/ccodex-sleep-state/releases) 下载并完整解压。普通 Windows 选 `windows-amd64`，Windows ARM 选 `windows-arm64`；Apple 芯片 Mac 选 `darwin-arm64`，Intel Mac 选 `darwin-amd64`。
-2. **Windows 双击 `start.cmd`，macOS 双击 `start.command`。** 浏览器会自动打开并进入本地面板，不需要先复制口令。
-3. 程序会自动备份并接入，打开面板。看到已接管后，**重启 Codex，新建会话**，发一条短消息；不用再点一次接入。旧会话不会被热切换。
+1. **Windows 双击 `start.cmd`，macOS 双击 `start.command`。** 浏览器会自动打开并进入本地面板，不需要先复制口令。
+2. 程序会自动备份并接入；如提示缺少连接，进入「订阅与代理」填写自己的代理或订阅并保存。
+3. 看到已接管后，**重启 Codex，新建会话**，发一条短消息；不用再点一次接入。旧会话不会被热切换。
 
 已有代理、订阅、模型和注入开关会保留；没有配过来源时尝试识别常见本地代理。首次 `setup` 没有明确设置兜底策略，就采用“采不到 state 时先正常转发”；之前明确选过严格模式的会继续保留。
 
@@ -40,7 +60,11 @@ macOS：
 
 `setup` 会创建缺失的服务配置、启动服务并打开面板；已有订阅和代理设置不会被重置。自动接入只检查本机 `127.0.0.1` 的常见 SOCKS5 端口，不扫描网络、不读取代理软件账号库。**启动本身不发送模型请求**；接入 Codex 后的采集可能消耗额度。服务 JSON 写坏了会进入修复面板，不会因为启动失败就静默删掉旧文件。
 
-服务运行时保留终端窗口。退出用 **Ctrl+C**，等配置恢复完成，再重启 Codex。关闭浏览器、关闭注入和停止服务，是三个不同操作。
+### 3. 验证与停止
+
+依次确认：**面板能打开 → Codex 配置显示已接管 → 新会话请求使面板计数增加 → Codex 收到回复**。只看到面板或「已接管」还不能说明上游请求成功；可用 state 也不代表回答质量已经验证。
+
+服务运行时保留终端窗口。退出用 **Ctrl+C**，等配置恢复完成，再重启 Codex。关闭浏览器、关闭注入和停止服务，是三个不同操作。升级、异常退出恢复和卸载见[完整部署流程](docs/deployment.md)。
 
 ## 面板里能做什么
 
@@ -90,7 +114,7 @@ macOS：
 | Responses 中转、CCS API key | 保留原上游和 API key 方式，不向中转发送官方登录凭据，不注入官方 state |
 | Codex profile / 独立 Codex Home | 需要选择同一份配置；本工具不会自动清空项目或任务级覆盖 |
 
-运行中只改注释或无关设置，不应再把整份配置判为冲突。**CCS 真正切换了 provider、上游或认证时，仍会停止转发**，防止凭据送错地方。这时去面板检查并保留当前配置，再重新接管；不要删除事务文件，也不用照着群消息盲改 TOML。
+运行中只改注释或无关设置，不应再把整份配置判为冲突。**CCS 真正切换了 provider、上游或认证时，仍会停止转发**，防止凭据送错地方。这时去面板检查并保留当前配置，再重新接管；不要删除事务文件，也不要在未确认原因时手改 TOML。
 
 最稳妥的切换顺序还是：**停止本服务 → CCS 切换 → 启动本服务 → 重启 Codex。** 兼容不是让两个程序同时抢写同一份配置。
 
@@ -112,7 +136,7 @@ macOS：
 | Codex 提示 `503 service_not_ready` | 直接打开错误里的 `admin_url`，按面板唯一的绿色按钮「一键接入 / 检查与修复」操作；不要在 CCS 或 Codex 里手改配置 |
 | Codex TOML 坏了 | 先保留备份；使用明确的重建流程或让 CCS 重新生成，不从坏文件里猜 API key |
 
-给群友或 AI Agent 发排查信息，先运行：
+分享排查信息前，先运行：
 
 ```powershell
 .\ccodex-sleep-state.exe doctor
@@ -147,23 +171,9 @@ macOS 对应 `./ccodex-sleep-state doctor`。不要发 `auth.json`、管理口�
 
 设置过 `CODEX_HOME` 会跟随它；本工具还有 `CCODEX_STATE_HOME` 和 `--data-dir`。不确定实际用的是哪份，运行 `paths`，不要凭目录名猜。
 
-## 一起试，一起反馈
+## 问题排查
 
-用起来有没有改善、哪个版本接不上、什么情况下又出问题，都欢迎来聊。报错和复现步骤也可以提 [Issue](https://github.com/gylive/ccodex-sleep-state/issues)，方便后面查找。
-
-| 个人微信 · 等待 | QQ 群 · 不过是大梦一场空 |
-|:---:|:---:|
-| <img src="docs/assets/wechat-personal.jpg" alt="作者个人微信二维码，扫码添加好友" width="280"> | <img src="docs/assets/qq-group.jpg" alt="QQ 群“不过是大梦一场空”二维码，群号 797481450" width="280"> |
-| 扫码添加作者个人微信；这是好友二维码，不是微信群入口。 | 扫码，或搜索群号 **797481450**。 |
-
-### 朋友的卡网 · RedeemAI
-
-<img src="docs/assets/redeemai-ad.jpg" alt="朋友的卡网 RedeemAI：AI 服务兑换及 Codex 额度相关商品，具体信息见卡网页面" width="640">
-
-朋友的卡网：[faka.redeemai.org](https://faka.redeemai.org)。友情展示，商品、价格及售后以卡网页面为准，图中的服务承诺未由本项目核验。本工具免费使用，无需购买；不代表 OpenAI 官方授权或背书。
-
-
-反馈时带上系统、Codex 版本、工具版本和错误提示就够了。**不要发账号凭据、完整订阅链接或未经检查的配置文件。**
+先查看[问题与验收清单](docs/issues-and-verification.md)，使用面板「遇到问题」或 `doctor` 获取脱敏诊断。反馈时记录系统、Codex 版本、工具版本、复现步骤和错误提示。**不要发送账号凭据、完整订阅链接或未经检查的配置文件。**
 
 ## 想改代码
 
